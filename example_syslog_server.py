@@ -6,6 +6,7 @@ import argparse
 import socket
 import os
 import sys
+import json
 
 from syslog_rfc5424_parser import SyslogMessage, ParseError
 
@@ -28,7 +29,7 @@ def main():
         message = message.decode('utf-8')
         try:
             message = SyslogMessage.parse(message)
-            print(message.as_json())
+            print(json.dumps(message.as_dict()))
         except ParseError as e:
             print(e, file=sys.stderr)
 
