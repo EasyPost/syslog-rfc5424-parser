@@ -10,7 +10,6 @@ setup(
     description="Parser for RFC5424-compatible Syslog messages",
     license="ISC",
     packages=find_packages(exclude=['tests']),
-    test_suite="nose.collector",
     classifiers=[
         "Development Status :: 4 - Beta",
         "Environment :: Console",
