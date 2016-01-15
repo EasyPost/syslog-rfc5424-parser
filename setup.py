@@ -2,11 +2,11 @@ from setuptools import setup, find_packages
 
 
 setup(
-    name="syslog_rfc5424_parser",
+    name="syslog-rfc5424-parser",
     version="0.1",
     author="James Brown",
     author_email="jbrown@easypost.com",
-    url="https://github.com/easypost/syslog_rfc5424_parser",
+    url="https://github.com/easypost/syslog-rfc5424-parser",
     description="Parser for RFC5424-compatible Syslog messages",
     license="ISC",
     packages=find_packages(exclude=['tests']),
