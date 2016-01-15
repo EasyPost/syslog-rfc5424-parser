@@ -102,8 +102,9 @@ class SyslogMessage(object):
         if structured_data != '-':
             for item in structured_data:
                 sd.setdefault(item['sd_id'], {})
-                for param_pair in item['sd_params']:
-                    sd[item['sd_id']][param_pair['param_name']] = param_pair['param_value']
+                if 'sd_params' in item:
+                    for param_pair in item['sd_params']:
+                        sd[item['sd_id']][param_pair['param_name']] = param_pair['param_value']
         return cls(severity=severity, facility=facility, version=version, hostname=hostname,
                    timestamp=timestamp, appname=appname, procid=procid, msgid=msgid, msg=msg,
                    sd=sd)

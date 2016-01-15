@@ -37,7 +37,13 @@ PARSE_VECTORS = (
         '<409>1 2016-01-15T00:00:00Z host2 prg - - - message',
         Expected(SyslogSeverity.alert, SyslogFacility.unknown, 1, '2016-01-15T00:00:00Z', 'host2',
                  'prg', '-', '-', 'message', {})
-    )
+    ),
+    # this one has an SD-ID, but no SD-PARAMS
+    (
+        '<78>1 2016-01-15T00:04:01+00:00 host1 CROND 10391 - [sdid] some_message',  # noqa
+        Expected(SyslogSeverity.info, SyslogFacility.cron, 1, '2016-01-15T00:04:01+00:00', 'host1', 'CROND', 10391,
+                 '-', 'some_message', {'sdid': {}})
+    ),
 )
 
 
