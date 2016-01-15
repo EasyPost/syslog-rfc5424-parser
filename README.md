@@ -1,5 +1,7 @@
 This module implements an [RFC 5424](https://tools.ietf.org/html/rfc5424) IETF Syslog Protocol parser in Python, using the [pyparsing](http://pyparsing.wikispaces.com/) parser-generator. It should work on Python 2.7 or Python 3.3+.
 
+[![Circle CI](https://circleci.com/gh/EasyPost/syslog_rfc5424_parser.svg?style=svg)](https://circleci.com/gh/EasyPost/syslog_rfc5424_parser)
+
 The file [example_syslog_server.py](example_syslog_server.py) contains a fully-functional Syslog server which will receivemessages on a UNIX domain socket and print them to stdout as JSON blobs.
 
 ### A word on performance
