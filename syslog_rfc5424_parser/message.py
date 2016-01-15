@@ -1,4 +1,4 @@
-import json
+import time
 
 import pyparsing
 
@@ -12,22 +12,70 @@ class ParseError(Exception):
         self.message = message
 
     def __repr__(self):
-        return '{0}({1!r}, {2!r})'.format(self.__class__.__name__, self.description, self.message)
+        return '{0}({1!r}, {2!r})'.format(self.__class__.__name__, self.description, self.message)  # pragma: no cover
 
     def __str__(self):
-        return '{0}: {1!r}'.format(self.description, self.message)
+        return '{0}: {1!r}'.format(self.description, self.message)  # pragma: no cover
 
 
 class SyslogMessage(object):
+    """Representation of a single RFC5424-format syslog message. """
+
     __slots__ = ['severity', 'facility', 'version', 'timestamp', 'hostname', 'appname', 'procid', 'msgid', 'sd', 'msg']
 
+    def __init__(self, severity, facility, version=1, timestamp='-', hostname='-', appname='-', procid='-',
+                 msgid='-', sd='-', msg=None):
+        """Initialize a syslog message (defaults correspond to the minimal default in the RFC"""
+        # I wish Python had initializer lists
+        self.severity = severity
+        self.facility = facility
+        self.version = version
+        self.timestamp = timestamp
+        self.hostname = hostname
+        self.appname = appname
+        self.procid = procid
+        self.msgid = msgid
+        if sd == '-':
+            self.sd = {}
+        else:
+            self.sd = sd
+        self.msg = msg
+
+    def __str__(self):
+        """Return this object represented as appropriate for the wire"""
+        if self.facility == SyslogFacility.unknown:
+            raise ValueError('Cannot dump a SyslogMessage with unknown facility')
+        pri = int(self.facility) * 8 + int(self.severity)
+        if isinstance(self.timestamp, (int, float)):
+            timestamp = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(self.timestamp))
+        else:
+            timestamp = self.timestamp
+        sd = []
+        for sd_id, sd_params in self.sd.items():
+            sd_data = []
+            for k, v in sd_params.items():
+                sd_data.append(' {k}="{v}"'.format(k=k, v=v))
+            sd.append('[{sd_id}{sd_data}]'.format(sd_id=sd_id, sd_data=''.join(sd_data)))
+        if sd:
+            sd = ''.join(sd)
+        else:
+            sd = '-'
+        if self.msg:
+            rest = ' {msg}'.format(msg=self.msg)
+        else:
+            rest = ''
+        return '<{pri}>{version} {timestamp} {hostname} {appname} {procid} {msgid} {sd}{rest}'.format(
+            pri=pri, version=self.version, timestamp=timestamp, hostname=self.hostname,
+            appname=self.appname, procid=self.procid, msgid=self.msgid, sd=sd, rest=rest
+        )
+
     @classmethod
-    def parse(cls, message):
+    def parse(cls, message_string):
+        """Construct a syslog message from a string"""
         try:
-            groups = parser.syslog_message.parseString(message)
+            groups = parser.syslog_message.parseString(message_string)
         except pyparsing.ParseException:
-            raise ParseError('Unable to parse message', message)
-        obj = cls()
+            raise ParseError('Unable to parse message', message_string)
         header = groups['header']
         structured_data = groups['sd']
         if 'msg' in groups:
@@ -37,35 +85,28 @@ class SyslogMessage(object):
         pri = int(header['pri'])
         fac = pri >> 3
         sev = pri & 7
+        severity = SyslogSeverity(sev)
         try:
-            obj.severity = SyslogSeverity(sev)
+            facility = SyslogFacility(fac)
         except Exception:
-            obj.severity = SyslogSeverity.unknown
-        try:
-            obj.facility = SyslogFacility(fac)
-        except Exception:
-            obj.facility = SyslogFacility.unknown
-        obj.version = header['version']
-        obj.hostname = header['hostname']
-        obj.timestamp = header['timestamp']
-        obj.appname = header['appname']
-        obj.procid = header['procname']
-        obj.msgid = header['msgid']
-        obj.msg = msg
-        obj.sd = {}
+            facility = SyslogFacility.unknown
+        version = header['version']
+        hostname = header['hostname']
+        timestamp = header['timestamp']
+        appname = header['appname']
+        procid = header['procname']
+        msgid = header['msgid']
+        msg = msg
+        sd = {}
+        """StructuredData pairs from the message, represented as a dictionary"""
         if structured_data != '-':
             for item in structured_data:
-                obj.sd.setdefault(item['sd_id'], {})
+                sd.setdefault(item['sd_id'], {})
                 for param_pair in item['sd_params']:
-                    obj.sd[item['sd_id']][param_pair['param_name']] = param_pair['param_value']
-        return obj
-
-    @property
-    def topic_name(self):
-        if 'origin' in self.sd and 'x-service' in self.sd['origin']:
-            return '{0}.syslog'.format(self.sd['origin']['x-service'])
-        else:
-            return 'syslog'
+                    sd[item['sd_id']][param_pair['param_name']] = param_pair['param_value']
+        return cls(severity=severity, facility=facility, version=version, hostname=hostname,
+                   timestamp=timestamp, appname=appname, procid=procid, msgid=msgid, msg=msg,
+                   sd=sd)
 
     def __repr__(self):
         return '{0}({1})'.format(
@@ -73,8 +114,10 @@ class SyslogMessage(object):
             ','.join('{0}={1!r}'.format(k, getattr(self, k)) for k in self.__slots__)
         )
 
-    def as_json(self):
-        return json.dumps(dict(
+    def as_dict(self):
+        """Dump this class to a dictionary of primitive objects, suitable for serializing with JSON/MsgPack/etc."""
+
+        return dict(
             (k, getattr(self, k).name if k in ('severity', 'facility') else getattr(self, k))
             for k in self.__slots__
-        ))
+        )

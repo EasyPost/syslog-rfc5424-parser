@@ -38,4 +38,3 @@ class SyslogSeverity(IntEnum):
     notice = 5
     info = 6
     debug = 7
-    unknown = -1
