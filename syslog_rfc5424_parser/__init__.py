@@ -1,6 +1,6 @@
 from .message import SyslogMessage, ParseError
 
-version_info = (0, 1)
+version_info = (0, 1, 1)
 __version__ = '.'.join(map(str, version_info))
 __author__ = 'James Brown <jbrown@easypost.com>'
 
