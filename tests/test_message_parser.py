@@ -13,36 +13,36 @@ Expected = collections.namedtuple('Expected', ['severity', 'facility', 'version'
 PARSE_VECTORS = (
     (
         '<1>1 - - - - - -',
-        Expected(SyslogSeverity.alert, SyslogFacility.kern, 1, '-', '-', '-', '-', '-', None, {})
+        Expected(SyslogSeverity.alert, SyslogFacility.kern, 1, '-', '-', '-', None, None, None, {})
     ),
     (
         '<78>1 2016-01-15T00:04:01+00:00 host1 CROND 10391 - [meta sequenceId="29"] some_message',  # noqa
         Expected(SyslogSeverity.info, SyslogFacility.cron, 1, '2016-01-15T00:04:01+00:00', 'host1', 'CROND', 10391,
-                 '-', 'some_message', {'meta': {'sequenceId': '29'}})
+                 None, 'some_message', {'meta': {'sequenceId': '29'}})
     ),
     (
         '<29>1 2016-01-15T01:00:43Z some-host-name SEKRETPROGRAM prg - [origin x-service="svcname"][meta sequenceId="1"] 127.0.0.1 - - 1452819643 "GET /health HTTP/1.1" 200 175 "-" "hacheck 0.9.0" 20812 127.0.0.1:40150 1199',  # noqa
         Expected(SyslogSeverity.notice, SyslogFacility.daemon, 1, '2016-01-15T01:00:43Z', 'some-host-name',
-                 'SEKRETPROGRAM', 'prg', '-', '127.0.0.1 - - 1452819643 "GET /health HTTP/1.1" 200 175 "-" "hacheck 0.9.0" 20812 127.0.0.1:40150 1199',  # noqa
+                 'SEKRETPROGRAM', 'prg', None, '127.0.0.1 - - 1452819643 "GET /health HTTP/1.1" 200 175 "-" "hacheck 0.9.0" 20812 127.0.0.1:40150 1199',  # noqa
                  {'meta': {'sequenceId': '1'}, 'origin': {'x-service': 'svcname'}})
     ),
     (
         '<190>1 2016-01-15T01:00:59+00:00 some-other-host 2016-01-15 - - [origin x-service="program"][meta sequenceId="4"] 01:00:59,989 PRG[14767:INFO] Starting up',  # noqa
         Expected(SyslogSeverity.info, SyslogFacility.local7, 1, '2016-01-15T01:00:59+00:00', 'some-other-host',
-                 '2016-01-15', '-', '-', msg='01:00:59,989 PRG[14767:INFO] Starting up',
+                 '2016-01-15', None, None, msg='01:00:59,989 PRG[14767:INFO] Starting up',
                  sd={'meta': {'sequenceId': '4'}, 'origin': {'x-service': 'program'}})
     ),
     # this one has a malformed PRI
     (
         '<409>1 2016-01-15T00:00:00Z host2 prg - - - message',
         Expected(SyslogSeverity.alert, SyslogFacility.unknown, 1, '2016-01-15T00:00:00Z', 'host2',
-                 'prg', '-', '-', 'message', {})
+                 'prg', None, None, 'message', {})
     ),
     # this one has an SD-ID, but no SD-PARAMS
     (
         '<78>1 2016-01-15T00:04:01+00:00 host1 CROND 10391 - [sdid] some_message',  # noqa
         Expected(SyslogSeverity.info, SyslogFacility.cron, 1, '2016-01-15T00:04:01+00:00', 'host1', 'CROND', 10391,
-                 '-', 'some_message', {'sdid': {}})
+                 None, 'some_message', {'sdid': {}})
     ),
 )
 

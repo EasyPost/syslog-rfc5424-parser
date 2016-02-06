@@ -23,8 +23,8 @@ class SyslogMessage(object):
 
     __slots__ = ['severity', 'facility', 'version', 'timestamp', 'hostname', 'appname', 'procid', 'msgid', 'sd', 'msg']
 
-    def __init__(self, severity, facility, version=1, timestamp='-', hostname='-', appname='-', procid='-',
-                 msgid='-', sd='-', msg=None):
+    def __init__(self, severity, facility, version=1, timestamp='-', hostname='-', appname='-', procid=None,
+                 msgid=None, sd='-', msg=None):
         """Initialize a syslog message (defaults correspond to the minimal default in the RFC"""
         # I wish Python had initializer lists
         self.severity = severity
@@ -66,7 +66,9 @@ class SyslogMessage(object):
             rest = ''
         return '<{pri}>{version} {timestamp} {hostname} {appname} {procid} {msgid} {sd}{rest}'.format(
             pri=pri, version=self.version, timestamp=timestamp, hostname=self.hostname,
-            appname=self.appname, procid=self.procid, msgid=self.msgid, sd=sd, rest=rest
+            appname=self.appname, procid='-' if self.procid is None else self.procid,
+            msgid='-' if self.msgid is None else self.msgid,
+            sd=sd, rest=rest
         )
 
     @classmethod
@@ -95,7 +97,11 @@ class SyslogMessage(object):
         timestamp = header['timestamp']
         appname = header['appname']
         procid = header['procname']
+        if procid == '-':
+            procid = None
         msgid = header['msgid']
+        if msgid == '-':
+            msgid = None
         msg = msg
         sd = {}
         """StructuredData pairs from the message, represented as a dictionary"""
