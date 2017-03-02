@@ -44,6 +44,11 @@ PARSE_VECTORS = (
         Expected(SyslogSeverity.info, SyslogFacility.cron, 1, '2016-01-15T00:04:01+00:00', 'host1', 'CROND', 10391,
                  None, 'some_message', {'sdid': {}})
     ),
+    (
+        '<85>1 2017-03-02T13:21:15.733598-08:00 vrs-1 polkitd 20481 - -  msg',
+        Expected(SyslogSeverity.notice, SyslogFacility.authpriv, 1, '2017-03-02T13:21:15.733598-08:00', 'vrs-1', 'polkitd', 20481,
+                 None, 'msg', {})
+    ),
 )
 
 
