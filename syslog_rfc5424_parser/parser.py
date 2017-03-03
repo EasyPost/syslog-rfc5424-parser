@@ -24,7 +24,7 @@ colon = Literal(":")
 rfc3164_date = Word(nums, min=4, max=4) + dash + Word(nums, min=2, max=2) + dash + Word(nums, min=2, max=2)
 rfc3164_time = Word(nums, min=2, max=2) + colon + Word(nums, min=2, max=2) + colon + Word(nums, min=2, max=2) + \
     Optional(Literal(".") + Word(nums, min=1, max=6))
-rfc3164_timenumoffset = (Literal("-") |  Literal("+")) + Word(nums, min=2, max=2) + colon + Word(nums, min=2, max=2)
+rfc3164_timenumoffset = (Literal("-") | Literal("+")) + Word(nums, min=2, max=2) + colon + Word(nums, min=2, max=2)
 rfc3164_timeoffset = Literal("Z") | rfc3164_timenumoffset
 rfc3164_timestamp = Combine(rfc3164_date + Literal("T") + rfc3164_time + rfc3164_timeoffset)
 
