@@ -10,7 +10,7 @@ setup(
     description="Parser for RFC5424-compatible Syslog messages",
     license="ISC",
     install_requires=[
-        'pyparsing>=2.0',
+        'pyparsing>=2.0,<3.0',
         'enum34'
     ],
     packages=find_packages(exclude=['tests']),

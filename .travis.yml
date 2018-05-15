@@ -8,4 +8,4 @@ python:
 install:
   - pip install -r requirements.txt -r requirements-tests.txt
 script:
-  - pytest -v tests/
+  - py.test --cov=syslog_rfc5424_parser --cov-report=term-missing --cov-fail-under=90 -v tests/
