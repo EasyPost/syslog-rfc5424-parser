@@ -110,7 +110,7 @@ class SyslogMessage(object):
                 sd.setdefault(item['sd_id'], {})
                 if 'sd_params' in item:
                     for param_pair in item['sd_params']:
-                        sd[item['sd_id']][param_pair['param_name']] = param_pair['param_value']
+                        sd[item['sd_id']][param_pair['param_name']] = param_pair.get('param_value', '')
         return cls(severity=severity, facility=facility, version=version, hostname=hostname,
                    timestamp=timestamp, appname=appname, procid=procid, msgid=msgid, msg=msg,
                    sd=sd)

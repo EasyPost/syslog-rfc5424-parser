@@ -46,9 +46,22 @@ PARSE_VECTORS = (
     ),
     (
         '<85>1 2017-03-02T13:21:15.733598-08:00 vrs-1 polkitd 20481 - -  msg',
-        Expected(SyslogSeverity.notice, SyslogFacility.authpriv, 1, '2017-03-02T13:21:15.733598-08:00', 'vrs-1', 'polkitd', 20481,
-                 None, 'msg', {})
+        Expected(SyslogSeverity.notice, SyslogFacility.authpriv, 1, '2017-03-02T13:21:15.733598-08:00', 'vrs-1',
+                 'polkitd', 20481, None, 'msg', {})
     ),
+    # reported in pr 2; empty sd-param body
+    (
+        '<29>1 2018-05-14T08:23:01.520Z leyal_test4 mgd 13894 UI_CHILD_EXITED [junos@2636.1.1.1.2.57 pid="14374" return-value="5" core-dump-status="" command="/usr/sbin/mustd"]',  # noqa
+        Expected(SyslogSeverity.notice, SyslogFacility.daemon, 1, '2018-05-14T08:23:01.520Z',
+                 'leyal_test4', 'mgd', 13894, 'UI_CHILD_EXITED', None, {
+                     'junos@2636.1.1.1.2.57': {
+                         'command': '/usr/sbin/mustd',
+                         'core-dump-status': '',
+                         'pid': '14374',
+                         'return-value': '5',
+                     }
+                 })
+    )
 )
 
 
