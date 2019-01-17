@@ -104,7 +104,9 @@ class SyslogMessage(object):
             msgid = None
         msg = msg
         sd = {}
-        """StructuredData pairs from the message, represented as a dictionary"""
+        # odd pyparsing inconsistency
+        if list(structured_data) == ['-']:
+            structured_data = '-'
         if structured_data != '-':
             for item in structured_data:
                 sd.setdefault(item['sd_id'], {})
