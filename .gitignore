@@ -10,3 +10,4 @@ sdist/
 .tox
 .cache
 .python-version
+venv/

@@ -3,14 +3,14 @@ from setuptools import setup, find_packages
 
 setup(
     name="syslog-rfc5424-parser",
-    version="0.1.4",
+    version="0.1.5",
     author="James Brown",
     author_email="jbrown@easypost.com",
     url="https://github.com/easypost/syslog-rfc5424-parser",
     description="Parser for RFC5424-compatible Syslog messages",
     license="ISC",
     install_requires=[
-        'pyparsing>=2.0,<3.0',
+        'pyparsing>=2.0,<2.3',
         'enum34'
     ],
     packages=find_packages(exclude=['tests']),
