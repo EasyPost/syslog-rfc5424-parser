@@ -8,9 +8,11 @@ setup(
     author_email="jbrown@easypost.com",
     url="https://github.com/easypost/syslog-rfc5424-parser",
     description="Parser for RFC5424-compatible Syslog messages",
+    long_description=open('README.md', 'r').read(),
+    long_description_content_type='text/markdown',
     license="ISC",
     install_requires=[
-        'pyparsing>=2.0,<2.3',
+        'pyparsing>=2.3,<3.0',
         'enum34'
     ],
     packages=find_packages(exclude=['tests']),

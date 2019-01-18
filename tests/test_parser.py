@@ -12,4 +12,4 @@ def test_minimal():
     assert parsed['header']['appname'] == '-'
     assert parsed['header']['procname'] == '-'
     assert parsed['header']['msgid'] == '-'
-    assert parsed['sd'] == '-'
+    assert parsed['sd'][0] == '-'

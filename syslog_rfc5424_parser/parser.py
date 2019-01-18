@@ -54,7 +54,7 @@ sd_element = Group(
     Suppress("]")
 )
 
-structured_data = (NilValue | Group(OneOrMore(sd_element))).setResultsName('sd_element')
+structured_data = (NilValue | OneOrMore(sd_element)).setResultsName('sd_element')
 
 msg = Combine(restOfLine + lineEnd)
 
