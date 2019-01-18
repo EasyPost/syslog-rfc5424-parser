@@ -47,16 +47,16 @@ ParsedMessage = collections.namedtuple('ParsedMessage', ['header', 'structured_d
 
 
 class TreeTransformer(Transformer):
-    def NILVALUE(inp):
+    def NILVALUE(self, inp):
         return '-'
 
-    def pri(inp):
+    def pri(self, inp):
         return int(inp[0])
 
-    def version(inp):
+    def version(self, inp):
         return int(inp[0])
 
-    def timestamp(inp):
+    def timestamp(self, inp):
         if len(inp) == 1:
             return inp[0]
         else:
@@ -64,22 +64,22 @@ class TreeTransformer(Transformer):
             rest = [str(i.children[0]) for i in inp[1:]]
             return datetime + ''.join(rest)
 
-    def hostname(inp):
+    def hostname(self, inp):
         return str(inp[0])
 
-    def appname(inp):
+    def appname(self, inp):
         return str(inp[0])
 
-    def procid(inp):
+    def procid(self, inp):
         inp = str(inp[0])
         if inp.isdigit():
             return int(inp)
         return inp
 
-    def msgid(inp):
+    def msgid(self, inp):
         return str(inp[0])
 
-    def structured_data(inp):
+    def structured_data(self, inp):
         if len(inp) == 1 and inp[0] == "-":
             return []
         output = []
@@ -93,10 +93,10 @@ class TreeTransformer(Transformer):
             output.append(SDElement(sd_id=sd_id, sd_params=sd_params))
         return output
 
-    def msg(inp):
+    def msg(self, inp):
         return str(inp[0])[1:]
 
-    def header(inp):
+    def header(self, inp):
         return Header(
             pri=inp[0],
             version=inp[1],
@@ -107,7 +107,7 @@ class TreeTransformer(Transformer):
             msgid=inp[6]
         )
 
-    def start(inp):
+    def start(self, inp):
         if len(inp) > 2:
             message = inp[2]
         else:
@@ -119,7 +119,7 @@ class TreeTransformer(Transformer):
         )
 
 
-_parser = Lark(GRAMMAR, parser='lalr', transformer=TreeTransformer)
+_parser = Lark(GRAMMAR, parser='lalr', transformer=TreeTransformer())
 
 
 def parse(s):

@@ -12,7 +12,7 @@ setup(
     long_description_content_type='text/markdown',
     license="ISC",
     install_requires=[
-        'pyparsing>=2.3,<3.0',
+        'lark-parser==0.6.*',
         'enum34'
     ],
     packages=find_packages(exclude=['tests']),
