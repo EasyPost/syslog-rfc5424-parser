@@ -47,7 +47,7 @@ PARSE_VECTORS = (
     (
         '<85>1 2017-03-02T13:21:15.733598-08:00 vrs-1 polkitd 20481 - -  msg',
         Expected(SyslogSeverity.notice, SyslogFacility.authpriv, 1, '2017-03-02T13:21:15.733598-08:00', 'vrs-1',
-                 'polkitd', 20481, None, 'msg', {})
+                 'polkitd', 20481, None, ' msg', {})
     ),
     # reported in pr 2; empty sd-param body
     (
@@ -61,6 +61,12 @@ PARSE_VECTORS = (
                          'return-value': '5',
                      }
                  })
+    ),
+    # reported in issue #7; multi-line body
+    (
+        '<78>1 2019-01-17T17:39:00Z localhost CROND 9999 - - some message\nwith embedded newlines',
+        Expected(SyslogSeverity.info, SyslogFacility.cron, 1, '2019-01-17T17:39:00Z',
+                 'localhost', 'CROND', 9999, None, 'some message\nwith embedded newlines', {})
     )
 )
 

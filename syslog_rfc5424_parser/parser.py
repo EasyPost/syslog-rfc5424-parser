@@ -58,8 +58,7 @@ structured_data = (NilValue | OneOrMore(sd_element)).setResultsName('sd_element'
 
 msg = Combine(restOfLine + lineEnd)
 
-syslog_message = header.setResultsName('header') + SP + structured_data.setResultsName('sd') + \
-    Optional(SP + msg.setResultsName('msg'))
+syslog_message = header.setResultsName('header') + SP + structured_data.setResultsName('sd')
 
 
 __all__ = ['syslog_message', 'structured_data', 'header']
