@@ -75,15 +75,15 @@ class SyslogMessage(object):
     def parse(cls, message_string):
         """Construct a syslog message from a string"""
         try:
-            groups = parser.syslog_message.parseString(message_string)
-        except pyparsing.ParseException:
+            groups, _, end_offset = next(parser.syslog_message.scanString(message_string))
+        except (pyparsing.ParseException, StopIteration):
             raise ParseError('Unable to parse message', message_string)
         header = groups['header']
         structured_data = groups['sd']
-        if 'msg' in groups:
-            msg = groups['msg']
-        else:
-            msg = None
+        msg = message_string[end_offset:] or None
+        if msg:
+            # always starts with a space
+            msg = msg[1:]
         pri = int(header['pri'])
         fac = pri >> 3
         sev = pri & 7
