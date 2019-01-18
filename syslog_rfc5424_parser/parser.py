@@ -1,64 +1,132 @@
-from pyparsing import Optional, Literal, QuotedString, Word, ZeroOrMore, OneOrMore, White, Group, Combine, Suppress
-from pyparsing import nums, printables, restOfLine, lineEnd
+import collections
 
-NameAscii = ''.join(c for c in printables if c not in ("=", " ", "]", '"'))
-NilValue = "-"
-SP = Suppress(White(ws=' ', min=1, max=1))
+from lark import Lark, Transformer
 
 
-def toInt(s, loc, toks):
-    return int(toks[0])
+GRAMMAR = '''
+    ?start           : header _SP structured_data [ msg ]
+    ?header          : pri version _SP timestamp _SP hostname _SP appname _SP procid _SP msgid
+    pri              : "<" /[0-9]{1,3}/ ">"
+    version          : /[1-9][0-9]{0,2}/
+    timestamp        : NILVALUE
+                     | /[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}/ time_secfrac? time_offset
+    time_secfrac     : /\.[0-9]{1,6}/
+    time_offset      : ZULU
+                     | _ntime_offset
+    _ntime_offset    : /[+-][0-9]{2}:[0-9]{2}/
+    structured_data  : NILVALUE
+                     | sd_element+
+    sd_element       : "[" sd_id (" " sd_param)* "]"
+    ?sd_id           : sd_name
+    sd_param         : param_name "=" ESCAPED_STRING
+    ?param_name      : sd_name
+    ?sd_name         : /[^= \]\"]{1,32}/
+    appname          : NILVALUE
+                     | /[!-~]{1,48}/
+    procid           : NILVALUE
+                     | /[!-~]{1,128}/
+    msgid            : NILVALUE
+                     | /[!-~]{1,32}/
+    hostname         : NILVALUE
+                     | /[!-~]{1,255}/
+    msg              : / .*/
+
+    %import common.ESCAPED_STRING   -> ESCAPED_STRING
+
+    _SP: " "
+    NILVALUE: "-"
+    ZULU: "Z"
+'''
 
 
-def maybeToInt(s, loc, toks):
-    if all(x.isdigit() for x in toks[0]):
-        return int(toks[0])
-    else:
-        return toks[0]
+Header = collections.namedtuple('Header', ['pri', 'version', 'timestamp', 'hostname', 'appname', 'procid', 'msgid'])
+
+SDElement = collections.namedtuple('SDElement', ['sd_id', 'sd_params'])
+
+ParsedMessage = collections.namedtuple('ParsedMessage', ['header', 'structured_data', 'message'])
 
 
-pri = Combine(Suppress(Literal("<")) + Word(nums, min=1, max=3) + Suppress(Literal(">"))).setParseAction(toInt)
-version = Word(nums).setParseAction(toInt)
-dash = Literal("-")
-colon = Literal(":")
-rfc3164_date = Word(nums, min=4, max=4) + dash + Word(nums, min=2, max=2) + dash + Word(nums, min=2, max=2)
-rfc3164_time = Word(nums, min=2, max=2) + colon + Word(nums, min=2, max=2) + colon + Word(nums, min=2, max=2) + \
-    Optional(Literal(".") + Word(nums, min=1, max=6))
-rfc3164_timenumoffset = (Literal("-") | Literal("+")) + Word(nums, min=2, max=2) + colon + Word(nums, min=2, max=2)
-rfc3164_timeoffset = Literal("Z") | rfc3164_timenumoffset
-rfc3164_timestamp = Combine(rfc3164_date + Literal("T") + rfc3164_time + rfc3164_timeoffset)
+class TreeTransformer(Transformer):
+    def NILVALUE(inp):
+        return '-'
 
-timestamp = NilValue | rfc3164_timestamp
-hostname = NilValue | Word(printables, min=1, max=255)
-appname = NilValue | Word(printables, min=1, max=48)
-procname = NilValue | Word(printables, min=1, max=128).setParseAction(maybeToInt)
-msgid = NilValue | Word(printables, min=1, max=32)
+    def pri(inp):
+        return int(inp[0])
 
-header = Group(
-    pri.setResultsName('pri') + version.setResultsName('version') + SP +
-    timestamp.setResultsName('timestamp') + SP + hostname.setResultsName('hostname') + SP +
-    appname.setResultsName('appname') + SP + procname.setResultsName('procname') + SP +
-    msgid.setResultsName('msgid')
-)
+    def version(inp):
+        return int(inp[0])
 
-sd_name = Word(NameAscii, min=1, max=32)
-sd_id = sd_name
-param_name = sd_name
-sd_param = Group(
-    param_name.setResultsName('param_name') + Suppress(Literal("=")) +
-    QuotedString(quoteChar='"', escChar='\\', escQuote='\\').setResultsName('param_value')
-)
+    def timestamp(inp):
+        if len(inp) == 1:
+            return inp[0]
+        else:
+            datetime = str(inp[0])
+            rest = [str(i.children[0]) for i in inp[1:]]
+            return datetime + ''.join(rest)
 
-sd_element = Group(
-    Suppress("[") + sd_id.setResultsName('sd_id') + ZeroOrMore(SP + sd_param).setResultsName('sd_params') +
-    Suppress("]")
-)
+    def hostname(inp):
+        return str(inp[0])
 
-structured_data = (NilValue | OneOrMore(sd_element)).setResultsName('sd_element')
+    def appname(inp):
+        return str(inp[0])
 
-msg = Combine(restOfLine + lineEnd)
+    def procid(inp):
+        inp = str(inp[0])
+        if inp.isdigit():
+            return int(inp)
+        return inp
 
-syslog_message = header.setResultsName('header') + SP + structured_data.setResultsName('sd')
+    def msgid(inp):
+        return str(inp[0])
+
+    def structured_data(inp):
+        if len(inp) == 1 and inp[0] == "-":
+            return []
+        output = []
+        for sd_element in inp:
+            sd_id = str(sd_element.children[0])
+            sd_params = []
+            for sd_param in sd_element.children[1:]:
+                param_name = str(sd_param.children[0])
+                param_value = str(sd_param.children[1])[1:-1]
+                sd_params.append((param_name, param_value))
+            output.append(SDElement(sd_id=sd_id, sd_params=sd_params))
+        return output
+
+    def msg(inp):
+        return str(inp[0])[1:]
+
+    def header(inp):
+        return Header(
+            pri=inp[0],
+            version=inp[1],
+            timestamp=inp[2],
+            hostname=inp[3],
+            appname=inp[4],
+            procid=inp[5],
+            msgid=inp[6]
+        )
+
+    def start(inp):
+        if len(inp) > 2:
+            message = inp[2]
+        else:
+            message = None
+        return ParsedMessage(
+            header=inp[0],
+            structured_data=inp[1],
+            message=message
+        )
 
 
-__all__ = ['syslog_message', 'structured_data', 'header']
+_parser = Lark(GRAMMAR, parser='lalr', transformer=TreeTransformer)
+
+
+def parse(s):
+    tree = _parser.parse(s)
+    return tree
+
+
+if __name__ == '__main__':
+    import sys
+    print(parse(sys.argv[1]))
