@@ -29,7 +29,7 @@ GRAMMAR = '''
                      | /[!-~]{1,32}/
     hostname         : NILVALUE
                      | /[!-~]{1,255}/
-    msg              : / .*/
+    msg              : / .*/ms
 
     %import common.ESCAPED_STRING   -> ESCAPED_STRING
 
