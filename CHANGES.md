@@ -1,3 +1,9 @@
+0.3.0
+-----
+- Switch from PyParsing to Lark for an almost 3x speedup
+- No changes to user-facing API
+- Add documentation via ReadTheDocs
+
 0.2.0
 -----
 - Allow message bodies to contain newlines. If you want to split on newlines, do it yourself up-front. Reported by

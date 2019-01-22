@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="syslog-rfc5424-parser",
-    version="0.2.0",
+    version="0.3.0",
     author="James Brown",
     author_email="jbrown@easypost.com",
     url="https://github.com/easypost/syslog-rfc5424-parser",
