@@ -15,6 +15,10 @@ setup(
         'lark-parser==0.6.*',
         'enum34'
     ],
+    project_urls={
+        'Issue Tracker': 'https://github.com/easypost/syslog-rfc5424-parser/issues',
+        'Documentations': 'https://syslog-rfc5424-parser.readthedocs.io/en/latest/',
+    },
     packages=find_packages(exclude=['tests']),
     classifiers=[
         "Development Status :: 4 - Beta",
