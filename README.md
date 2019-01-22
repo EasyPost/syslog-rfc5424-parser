@@ -2,6 +2,7 @@ This module implements an [RFC 5424](https://tools.ietf.org/html/rfc5424) IETF S
 
 [![Build Status](https://travis-ci.org/EasyPost/syslog-rfc5424-parser.svg?branch=master)](https://travis-ci.org/EasyPost/syslog-rfc5424-parser)
 [![PyPI version](https://badge.fury.io/py/syslog-rfc5424-parser.svg)](https://badge.fury.io/py/syslog-rfc5424-parser)
+[![Documentation Status](https://readthedocs.org/projects/syslog-rfc5424-parser/badge/?version=latest)](https://syslog-rfc5424-parser.readthedocs.io/en/latest/?badge=latest)
 
 The file [example_syslog_server.py](example_syslog_server.py) contains a fully-functional Syslog server which will receivemessages on a UNIX domain socket and print them to stdout as JSON blobs.
 
