@@ -1,6 +1,6 @@
 import time
 
-import pyparsing
+import lark
 
 from . import parser
 from .constants import SyslogSeverity, SyslogFacility
@@ -75,16 +75,11 @@ class SyslogMessage(object):
     def parse(cls, message_string):
         """Construct a syslog message from a string"""
         try:
-            groups, _, end_offset = next(parser.syslog_message.scanString(message_string))
-        except (pyparsing.ParseException, StopIteration):
+            groups = parser.parse(message_string)
+        except lark.UnexpectedInput:
             raise ParseError('Unable to parse message', message_string)
-        header = groups['header']
-        structured_data = groups['sd']
-        msg = message_string[end_offset:] or None
-        if msg:
-            # always starts with a space
-            msg = msg[1:]
-        pri = int(header['pri'])
+        header = groups.header
+        pri = int(header.pri)
         fac = pri >> 3
         sev = pri & 7
         severity = SyslogSeverity(sev)
@@ -92,29 +87,23 @@ class SyslogMessage(object):
             facility = SyslogFacility(fac)
         except Exception:
             facility = SyslogFacility.unknown
-        version = header['version']
-        hostname = header['hostname']
-        timestamp = header['timestamp']
-        appname = header['appname']
-        procid = header['procname']
+        version = header.version
+        hostname = header.hostname
+        timestamp = header.timestamp
+        appname = header.appname
+        procid = header.procid
         if procid == '-':
             procid = None
-        msgid = header['msgid']
+        msgid = header.msgid
         if msgid == '-':
             msgid = None
-        msg = msg
         sd = {}
-        # odd pyparsing inconsistency
-        if list(structured_data) == ['-']:
-            structured_data = '-'
-        if structured_data != '-':
-            for item in structured_data:
-                sd.setdefault(item['sd_id'], {})
-                if 'sd_params' in item:
-                    for param_pair in item['sd_params']:
-                        sd[item['sd_id']][param_pair['param_name']] = param_pair.get('param_value', '')
+        for item in groups.structured_data:
+            sd.setdefault(item.sd_id, {})
+            for param_name, param_value in item.sd_params:
+                sd[item.sd_id][param_name] = param_value
         return cls(severity=severity, facility=facility, version=version, hostname=hostname,
-                   timestamp=timestamp, appname=appname, procid=procid, msgid=msgid, msg=msg,
+                   timestamp=timestamp, appname=appname, procid=procid, msgid=msgid, msg=groups.message,
                    sd=sd)
 
     def __repr__(self):
