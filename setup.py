@@ -1,5 +1,13 @@
+import sys
+
 from setuptools import setup, find_packages
 
+
+def install_requires():
+    if sys.version_info >= (3, 4):
+        return ['lark-parser==0.6.*']
+    else:
+        return ['lark-parser==0.6.*', 'enum34']
 
 setup(
     name="syslog-rfc5424-parser",
@@ -11,10 +19,7 @@ setup(
     long_description=open('README.md', 'r').read(),
     long_description_content_type='text/markdown',
     license="ISC",
-    install_requires=[
-        'lark-parser==0.6.*',
-        'enum34'
-    ],
+    install_requires=install_requires(),
     project_urls={
         'Issue Tracker': 'https://github.com/easypost/syslog-rfc5424-parser/issues',
         'Documentations': 'https://syslog-rfc5424-parser.readthedocs.io/en/latest/',
