@@ -1,3 +1,7 @@
+0.3.1
+-----
+- Only install `enum34` as a dependency on older version of Python (thanks Github user @pvinci)
+
 0.3.0
 -----
 - Switch from PyParsing to Lark for an almost 3x speedup
