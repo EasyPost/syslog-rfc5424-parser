@@ -1,4 +1,4 @@
-NEXT
+0.3.2
 ----
 - Fix `DeprecationWarning` (thanks again to @pvinci)
 - Drop Python 3.3 from officially-supported list of interpreters
