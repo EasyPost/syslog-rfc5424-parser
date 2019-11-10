@@ -1,3 +1,9 @@
+NEXT
+----
+- Fix `DeprecationWarning` (thanks again to @pvinci)
+- Drop Python 3.3 from officially-supported list of interpreters
+- Add Python 3.7 to interpreter list
+
 0.3.1
 -----
 - Only install `enum34` as a dependency on older version of Python (thanks Github user @pvinci)
