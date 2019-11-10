@@ -3,7 +3,7 @@ import collections
 from lark import Lark, Transformer
 
 
-GRAMMAR = '''
+GRAMMAR = r'''
     ?start           : header _SP structured_data [ msg ]
     ?header          : pri version _SP timestamp _SP hostname _SP appname _SP procid _SP msgid
     pri              : "<" /[0-9]{1,3}/ ">"
