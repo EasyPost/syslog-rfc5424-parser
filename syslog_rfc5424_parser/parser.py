@@ -7,7 +7,7 @@ GRAMMAR = r'''
     ?start           : header _SP structured_data [ msg ]
     ?header          : pri version _SP timestamp _SP hostname _SP appname _SP procid _SP msgid
     pri              : "<" /[0-9]{1,3}/ ">"
-    version          : /[1-9][0-9]{0,2}/
+    version          : /[0-9]+/
     timestamp        : NILVALUE
                      | /[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}/ time_secfrac? time_offset
     time_secfrac     : /\.[0-9]{1,6}/

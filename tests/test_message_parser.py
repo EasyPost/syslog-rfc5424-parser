@@ -90,7 +90,15 @@ PARSE_VECTORS = (
                 }
             }
         )
-    )
+    ),
+    # requested in #15
+    (
+        '''<142>0 2020-08-07T05:35:04+05:30 localhost root[6045]: root 6045 - Sample Message''',
+        Expected(SyslogSeverity.info, SyslogFacility.local1, 0, '2020-08-07T05:35:04+05:30',
+            'localhost', 'root[6045]:', 'root', '6045', 'Sample Message',
+            {}
+        )
+    ),
 
 )
 
