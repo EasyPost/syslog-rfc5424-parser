@@ -1,4 +1,4 @@
-This module implements an [RFC 5424](https://tools.ietf.org/html/rfc5424) IETF Syslog Protocol parser in Python, using the [lark](https://github.com/lark-parser/lark) parser-generator. It should work on Python 2.7 or Python 3.3+.
+This module implements an [RFC 5424](https://tools.ietf.org/html/rfc5424) IETF Syslog Protocol parser in Python, using the [lark](https://github.com/lark-parser/lark) parser-generator. It should work on Python 3.3+.
 
 [![Build Status](https://travis-ci.com/EasyPost/syslog-rfc5424-parser.svg?branch=master)](https://travis-ci.com/EasyPost/syslog-rfc5424-parser)
 [![PyPI version](https://badge.fury.io/py/syslog-rfc5424-parser.svg)](https://badge.fury.io/py/syslog-rfc5424-parser)
