@@ -71,7 +71,8 @@ PARSE_VECTORS = (
     # requested in #10
     (
         '''<134>1 2019-01-20T23:43:41.087236Z 172.16.3.1 NAT 15634 SADD [nsess SSUBIX="0" SVLAN="0" IATYP="IPv4" ISADDR="172.16.1.2" ISPORT="6303" XATYP="IPv4" XSADDR="10.0.0.3" XSPORT="16253" PROTO="6" XDADDR="172.16.2.2" XDPORT="80"] <type 'str'>''',  # noqa
-        Expected(SyslogSeverity.info, SyslogFacility.local0, 1, '2019-01-20T23:43:41.087236Z',
+        Expected(
+            SyslogSeverity.info, SyslogFacility.local0, 1, '2019-01-20T23:43:41.087236Z',
             '172.16.3.1', 'NAT', 15634,
             'SADD', '''<type 'str'>''',
             {
