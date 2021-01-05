@@ -1,3 +1,8 @@
+NEXT
+----
+- Drop support for Python 2.x
+- Switch CI from Travis CI to Github Actions
+
 0.3.2
 ----
 - Fix `DeprecationWarning` (thanks again to @pvinci)
